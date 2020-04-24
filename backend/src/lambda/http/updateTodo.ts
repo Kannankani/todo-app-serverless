@@ -10,7 +10,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
   const todoItemAccess = new TodoItemAccess
 
-  const retTodo = await todoItemAccess.updateTodo (todoId, updatedTodo)
+  await todoItemAccess.updateTodo (todoId, updatedTodo)
 
   // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
   return {
@@ -20,7 +20,6 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      retTodo
     })
   }
   

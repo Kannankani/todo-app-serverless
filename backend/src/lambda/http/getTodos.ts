@@ -6,6 +6,8 @@ import { getUserId } from '../utils';
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   // TODO: Get all TODO items for a current user
+  console.log ('prociessing get: ', event)
+
   const todoItemAccess = new TodoItemAccess
   const userId         = getUserId (event)
   const todos = await todoItemAccess.getUserTodos (userId)

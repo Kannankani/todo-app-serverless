@@ -60,32 +60,62 @@ export class TodoItemAccess {
 
   async updateTodo (id: string, todoupdate: TodoUpdate) 
     :Promise <void> {
-    console.log ('update todo for: ' + id)
-    await this.docClient.update( {
+    console.log ('update todo for: ' + id) 
+    try {
+      const r = await this.docClient.update( {
         TableName: this.todoItemTable,
         Key : {
             "todoId" : id
         },
         UpdateExpression: 
-            "set name = :name, dueDate = :dueDate, done=:done",
+            "set #p_name = :v_name, dueDate = :v_dueDate, done=:v_done",
         ExpressionAttributeValues:{
-            ":name": todoupdate.name,
-            ":dueDate": todoupdate.dueDate,
-            ":done": todoupdate.done
+            ":v_name": todoupdate.name,
+            ":v_dueDate": todoupdate.dueDate,
+            ":v_done": todoupdate.done
         },
-        // ReturnValues:"UPDATED_NEW"
-    }).promise
-    return
+        ExpressionAttributeNames: {
+          '#p_name': 'name'
+        },
+        ReturnValues:'UPDATED_NEW'
+    }).promise()
+    console.log ("update success: ", r)
+    }
+    catch (err) {
+      console.log ("update fail: ", err)
+    }
+    
+    return 
   }
 
 
   async deleteTodo (id: string): Promise <void> {
-    await this.docClient.delete ({
-      TableName: this.todoItemTable,
+    console.log (' datalayer delete for id: ', id)
+
+    /*
+    var params = {
+      TableName : this.todoItemTable,
       Key: {
         "todoId" : id
       }
-    }).promise
+    };
+    */
+
+    try {
+      const r = await this.docClient.delete ({
+        TableName: this.todoItemTable,
+        Key: {
+          "todoId" : id
+        },
+        ReturnItemCollectionMetrics: 'SIZE',
+        ReturnValues: 'ALL_OLD'
+      }).promise()
+
+      console.log('delete success: ', r)
+
+    } catch (err) {
+      console.log ('error in delete: ', err)
+    }
     return
   }
 

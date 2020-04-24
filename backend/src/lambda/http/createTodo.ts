@@ -12,16 +12,20 @@ import { getUserId } from '../utils'
 const bucketName = process.env.IMAGES_S3_BUCKET
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  
+  console.log ('prociessing create: ', event)
+
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
   const todoItemAccess = new TodoItemAccess;
-  var todoItem: TodoItem
-  var newTodoItem :TodoItem
+  const userId:string = getUserId (event)
+  var todoItem = <TodoItem> {}
+  var newTodoItem = <TodoItem> {}
 
   console.log('create reqest')
   console.log (newTodo)
   console.log ('event')
 
-  todoItem.userId        = getUserId (event)
+  todoItem.userId        = userId
   todoItem.todoId        = uuid.v4()
   todoItem.createdAt     = new Date().toISOString()
   todoItem.name          = newTodo.name
@@ -39,7 +43,7 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-      newTodoItem
+      item: newTodoItem
     })
   }
 }
