@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "CreateTodos",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minimum": 1
+      },
+      "dueDate": {
+        "type": "string", 
+        "format": "date"
+      }
+    },
+    "required": [
+      "name",
+      "dueDate"
+    ],
+    "additionalProperties": false
+}
+  
+  

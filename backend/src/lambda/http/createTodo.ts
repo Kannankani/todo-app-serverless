@@ -8,22 +8,20 @@ import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { TodoItemAccess} from '../../dataLayer/todoItemAccess'
 import { TodoItem } from '../../models/TodoItem'
 import { getUserId } from '../utils'
+import { createLogger } from '../../utils/logger'
 
 const bucketName = process.env.IMAGES_S3_BUCKET
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   
-  console.log ('prociessing create: ', event)
-
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
   const todoItemAccess = new TodoItemAccess;
   const userId:string = getUserId (event)
   var todoItem = <TodoItem> {}
   var newTodoItem = <TodoItem> {}
 
-  console.log('create reqest')
-  console.log (newTodo)
-  console.log ('event')
+  const logger = createLogger('create')  
+  logger.info('create todo:', newTodo)
 
   todoItem.userId        = userId
   todoItem.todoId        = uuid.v4()
@@ -35,15 +33,35 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
                               todoItem.todoId
                               
   // TODO: Implement creating a new TODO item
-  newTodoItem = await todoItemAccess.createTodo (todoItem);
-  return {
-    statusCode: 201,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': true
-    },
-    body: JSON.stringify({
-      item: newTodoItem
-    })
+  try {
+
+    newTodoItem = await todoItemAccess.createTodo (todoItem);
+    return {
+      statusCode: 201,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
+      body: JSON.stringify({
+        item: newTodoItem
+      })
+    }
+
   }
+  catch (err) {
+    logger.info('create todo error:', {
+      errMsg: err
+    })
+    return {
+      statusCode: 500,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
+      body: JSON.stringify({
+        err: 'unable to create todo'
+      })
+    }
+  }
+
 }
